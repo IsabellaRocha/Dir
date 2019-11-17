@@ -9,43 +9,52 @@
 #include <sys/types.h>
 
 int main() {
-    DIR *direct = opendir("DIR");
-    struct dirent* dir;
+    DIR *direct = opendir(".");
+    if (errno == -1) {
+        printf("Error: %s", strerror(errno));
+        return 0;
+    }
+    struct dirent* dir = readdir(direct);
 
     printf("Statistics for directory\n");
 
     struct stat n;
     int size;
-    while (direct) {
-        dir = readdir(direct);
-        if (dir->d_type != DT_DIR) {
-            int error = stat(dir, &n);
-            if (error == -1) {
-                printf("Error: %s", strerror(errno));
-                return 0;
-            }
-            else {
-                size += n.st_size;
-            }
+    while (dir) {
+        int error = stat(dir->d_name, &n);
+        if (error == -1) {
+            printf("Error: %s", strerror(errno));
+            return 0;
         }
+        else {
+            size += n.st_size;
+        }
+        dir = readdir(direct);
     }
     printf("\nTotal Directory Size: %d Bytes\n", size);
+
     rewinddir(direct);
+    dir = readdir(direct);
+
     printf("\nDirectories:\n");
-    while (direct) {
-        dir = readdir(direct);
+
+    while (dir) {
         if(dir->d_type == DT_DIR) {
             printf("\t%s\n", dir->d_name);
         }
+        dir = readdir(direct);
     }
     rewinddir(direct);
+    dir = readdir(direct);
+
     printf("\nRegular Files:\n");
-    while (direct) {
-        dir = readdir(direct);
+
+    while (dir) {
         if(dir->d_type != DT_DIR) {
             printf("\t%s\n", dir->d_name);
         }
+        dir = readdir(direct);
     }
-    closedir(dir);
+    closedir(direct);
     return 0;
 }
