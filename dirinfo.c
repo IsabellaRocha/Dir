@@ -10,8 +10,10 @@
 
 int main(int argc, char *argv[]) {
     DIR *direct;
+    char *dirname;
     if (argc > 1) {
-        direct = opendir(argv[1]);
+        strcpy(dirname, argv[1]);
+        direct = opendir(dirname);
         if (errno == -1) {
             printf("Error: %s", strerror(errno));
             return 0;
