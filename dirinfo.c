@@ -8,8 +8,19 @@
 #include <dirent.h>
 #include <sys/types.h>
 
-int main() {
-    DIR *direct = opendir(".");
+int main(int argc, char *argv[]) {
+    DIR *direct;
+    if (argc > 1) {
+        direct = opendir(argv[1]);
+        if (errno == -1) {
+            printf("Error: %s", strerror(errno));
+            return 0;
+        }
+    }
+    else {
+        printf("Please enter a directory");
+        return 0;
+    }
     if (errno == -1) {
         printf("Error: %s", strerror(errno));
         return 0;
